@@ -2,19 +2,22 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const postRoutes = require('./routes/posts');
+const authRoutes = require('./routes/auth'); // Impor rute autentikasi
 const { testDbConnection } = require('./config/db');
+const errorHandler = require('./middleware/errorHandler'); // Impor middleware penanganan error
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Mengizinkan permintaan lintas domain
-app.use(express.json()); // Mengizinkan parsing JSON dari body request
+app.use(cors());
+app.use(express.json());
 
 // Test database connection on startup
 testDbConnection();
 
 // Routes
+app.use('/api/auth', authRoutes); // Gunakan rute autentikasi
 app.use('/api/posts', postRoutes);
 
 // Basic home route
@@ -22,11 +25,8 @@ app.get('/', (req, res) => {
     res.send('Welcome to the Blog API!');
 });
 
-// Error handling middleware (optional but good practice)
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
+// Middleware penanganan error global (harus diletakkan paling akhir setelah semua rute)
+app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {

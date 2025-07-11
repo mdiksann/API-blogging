@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Blog</h1>
+
+        <div class="auth-section">
+            <h2>Autentikasi</h2>
+            <form id="authForm">
+                <input type="text" id="authUsername" placeholder="Username" required>
+                <input type="password" id="authPassword" placeholder="Password" required>
+                <button type="submit" id="loginButton">Login</button>
+                <button type="button" id="registerButton">Register</button>
+            </form>
+            <p id="authMessage" class="message"></p>
+            <p id="loggedInUser"></p>
+            <button id="logoutButton" style="display: none;">Logout</button>
+        </div>
+
+        <hr>
+
+        <h2>Buat Postingan Baru</h2>
+        <form id="createPostForm">
+            <input type="text" id="postTitle" placeholder="Judul Postingan" required>
+            <textarea id="postContent" placeholder="Isi Postingan" rows="5" required></textarea>
+            <button type="submit">Tambah Postingan</button>
+        </form>
+        <p id="createPostMessage" class="message"></p>
+
+        <hr>
+
+        <h2>Daftar Postingan</h2>
+        <div id="postsList">
+            <p>Memuat postingan...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

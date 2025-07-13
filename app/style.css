@@ -1,137 +1,388 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* Example font */
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5; /* Light grey background */
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     min-height: 100vh;
 }
 
-.container {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.content-wrapper {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px; /* Max width for content */
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-h1, h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid #eee;
-    margin: 30px 0;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-input[type="text"],
-input[type="password"],
-textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    width: calc(100% - 22px); /* adjust for padding and border */
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-.post-card {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.post-card h3 {
-    margin-top: 0;
-    color: #007bff;
-}
-
-.post-card p {
-    color: #555;
-    line-height: 1.6;
-}
-
-.post-meta {
-    font-size: 0.9em;
-    color: #777;
-    margin-top: 10px;
+/* --- Navbar --- */
+.navbar {
+    width: 100%;
+    max-width: 1200px;
+    background-color: #fff;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 8px; /* Rounded corners for the navbar */
+    margin-top: 20px; /* Space from top */
 }
 
-.post-actions button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    font-size: 0.85em;
+.navbar-logo {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #333;
+    display: flex;
+    align-items: center;
 }
 
-.post-actions .edit-btn {
-    background-color: #28a745;
+.navbar-logo i {
+    margin-right: 8px;
+    color: #666; /* Adjust color as needed */
 }
 
-.post-actions .edit-btn:hover {
-    background-color: #218838;
+.navbar-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px;
 }
 
-.post-actions .delete-btn {
+.navbar-menu a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    padding-bottom: 5px;
+    transition: color 0.3s ease;
+}
+
+.navbar-menu a:hover,
+.navbar-menu li.active a {
+    color: #007bff; /* Highlight active/hover */
+    border-bottom: 2px solid #007bff;
+}
+
+.navbar-auth {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-signup {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-signup:hover {
+    background-color: #e6f2ff;
+}
+
+.btn-login {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.btn-login:hover {
+    background-color: #0056b3;
+}
+
+.btn-logout {
     background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
 }
-
-.post-actions .delete-btn:hover {
+.btn-logout:hover {
     background-color: #c82333;
 }
 
-.message {
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 10px;
+/* --- Auth Modal --- */
+.auth-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more specific */
+    max-width: 400px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     text-align: center;
+}
+
+.auth-modal-content h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.auth-modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-modal-content input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.auth-modal-content button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    font-size: 1em;
+    margin-top: 5px;
+}
+
+.auth-modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.auth-modal-content .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
     font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
 }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: #c3e6cb;
+.auth-modal-content .close-button:hover,
+.auth-modal-content .close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
+.message {
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+.message.success { background-color: #d4edda; color: #155724; }
+.message.error { background-color: #f8d7da; color: #721c24; }
+
+
+/* --- Hero Section --- */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 450px; /* Adjust height as needed */
+    background-color: #333; /* Fallback background */
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    align-items: flex-end; /* Align content to bottom */
+    padding: 30px;
+    box-sizing: border-box;
+    color: white;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0)); /* Dark overlay */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 60%; /* Adjust width for text */
+}
+
+.hero-tags {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.hero-tag {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.hero-date {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.hero-title {
+    font-size: 2.5em;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 15px;
+}
+
+.hero-description {
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.hero-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+}
+
+.hero-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.hero-meta i {
+    margin-right: 5px;
+}
+
+/* --- Posts Grid Section --- */
+.posts-grid-section {
+    padding: 20px 0;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.post-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden; /* For image corners */
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card-image {
+    width: 100%;
+    height: 180px; /* Fixed height for consistent cards */
+    object-fit: cover;
+    display: block;
+}
+
+.post-card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.post-card-date {
+    font-size: 0.8em;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.post-card-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.4;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.post-card-description {
+    font-size: 0.9em;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Allows content to push footer down */
+}
+
+.post-card-category {
+    font-size: 0.8em;
+    font-weight: 500;
+    color: #007bff;
+    text-transform: uppercase;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .navbar-menu ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    .hero-section {
+        height: 350px;
+        padding: 20px;
+    }
+    .hero-content {
+        max-width: 90%;
+    }
+    .hero-title {
+        font-size: 1.8em;
+    }
+    .posts-grid {
+        grid-template-columns: 1fr; /* Single column on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        border-radius: 0;
+        margin-top: 0;
+    }
+    .hero-section {
+        border-radius: 0;
+    }
+    .content-wrapper {
+        padding: 10px;
+    }
+    .hero-title {
+        font-size: 1.5em;
+    }
 }

@@ -3,14 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Blog App</title>
+    <title>News Blog</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Blog</h1>
+    <header class="navbar">
+        <div class="navbar-logo">
+            <i class="fas fa-eye"></i> MOCKUPS HUB FREE
+        </div>
+        <nav class="navbar-menu">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">My Fead</a></li>
+                <li><a href="#">Related posts</a></li>
+                <li class="active"><a href="#">News</a></li>
+            </ul>
+        </nav>
+        <div class="navbar-auth">
+            <button class="btn btn-signup">Sign up</button>
+            <button class="btn btn-login" id="navLoginButton">Log in</button>
+            <span id="loggedInUser" style="display: none;"></span>
+            <button class="btn btn-logout" id="navLogoutButton" style="display: none;">Logout</button>
+        </div>
+    </header>
 
-        <div class="auth-section">
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <span class="close-button">&times;</span>
             <h2>Autentikasi</h2>
             <form id="authForm">
                 <input type="text" id="authUsername" placeholder="Username" required>
@@ -19,27 +39,19 @@
                 <button type="button" id="registerButton">Register</button>
             </form>
             <p id="authMessage" class="message"></p>
-            <p id="loggedInUser"></p>
-            <button id="logoutButton" style="display: none;">Logout</button>
-        </div>
-
-        <hr>
-
-        <h2>Buat Postingan Baru</h2>
-        <form id="createPostForm">
-            <input type="text" id="postTitle" placeholder="Judul Postingan" required>
-            <textarea id="postContent" placeholder="Isi Postingan" rows="5" required></textarea>
-            <button type="submit">Tambah Postingan</button>
-        </form>
-        <p id="createPostMessage" class="message"></p>
-
-        <hr>
-
-        <h2>Daftar Postingan</h2>
-        <div id="postsList">
-            <p>Memuat postingan...</p>
         </div>
     </div>
+
+    <main class="content-wrapper">
+        <section class="hero-section" id="heroPost">
+            </section>
+
+        <section class="posts-grid-section">
+            <div id="postsGrid" class="posts-grid">
+                <p>Memuat postingan...</p>
+            </div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>

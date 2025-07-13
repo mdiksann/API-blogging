@@ -1,26 +1,27 @@
-const API_URL = 'http://localhost:3000/api'; // Ganti jika API Anda berjalan di port lain
+const API_URL = 'http://localhost:3000/api';
 
+// --- Auth Modal Elements ---
+const navLoginButton = document.getElementById('navLoginButton');
+const navLogoutButton = document.getElementById('navLogoutButton');
+const authModal = document.getElementById('authModal');
+const closeButton = document.querySelector('.auth-modal .close-button');
 const authForm = document.getElementById('authForm');
 const authUsernameInput = document.getElementById('authUsername');
 const authPasswordInput = document.getElementById('authPassword');
-const loginButton = document.getElementById('loginButton');
-const registerButton = document.getElementById('registerButton');
+const loginButton = document.getElementById('loginButton'); // Button inside modal
+const registerButton = document.getElementById('registerButton'); // Button inside modal
 const authMessage = document.getElementById('authMessage');
 const loggedInUserSpan = document.getElementById('loggedInUser');
-const logoutButton = document.getElementById('logoutButton');
 
-const createPostForm = document.getElementById('createPostForm');
-const postTitleInput = document.getElementById('postTitle');
-const postContentInput = document.getElementById('postContent');
-const createPostMessage = document.getElementById('createPostMessage');
-
-const postsList = document.getElementById('postsList');
+// --- Post Elements ---
+const heroPostSection = document.getElementById('heroPost');
+const postsGrid = document.getElementById('postsGrid');
 
 let token = localStorage.getItem('blog_token');
 let currentUsername = localStorage.getItem('blog_username');
 let currentUserId = localStorage.getItem('blog_user_id');
 
-// --- Fungsi Helper ---
+// --- Helper Functions ---
 function displayMessage(element, message, type) {
     element.textContent = message;
     element.className = `message ${type}`;
@@ -32,23 +33,39 @@ function displayMessage(element, message, type) {
 
 function updateAuthUI() {
     if (token && currentUsername && currentUserId) {
-        loggedInUserSpan.textContent = `Logged in as: ${currentUsername}`;
-        logoutButton.style.display = 'inline-block';
-        authForm.style.display = 'none'; // Hide auth form when logged in
-        createPostForm.style.display = 'flex'; // Show create post form
+        loggedInUserSpan.textContent = `Hello, ${currentUsername}!`;
+        loggedInUserSpan.style.display = 'inline';
+        navLogoutButton.style.display = 'inline-block';
+        navLoginButton.style.display = 'none'; // Hide login button
+        authModal.style.display = 'none'; // Hide modal if logged in
     } else {
         loggedInUserSpan.textContent = '';
-        logoutButton.style.display = 'none';
-        authForm.style.display = 'flex'; // Show auth form when logged out
-        createPostForm.style.display = 'none'; // Hide create post form
+        loggedInUserSpan.style.display = 'none';
+        navLogoutButton.style.display = 'none';
+        navLoginButton.style.display = 'inline-block'; // Show login button
     }
-    fetchPosts(); // Refresh posts to update visibility of edit/delete buttons
+    // Refresh posts to potentially update action buttons (though not present in this design)
+    fetchPosts();
 }
 
-// --- Autentikasi ---
+// --- Auth Modal & Buttons ---
+navLoginButton.addEventListener('click', () => {
+    authModal.style.display = 'flex'; // Show modal
+});
+
+closeButton.addEventListener('click', () => {
+    authModal.style.display = 'none'; // Hide modal
+});
+
+window.addEventListener('click', (event) => {
+    if (event.target == authModal) {
+        authModal.style.display = 'none'; // Hide modal if click outside
+    }
+});
+
 authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // Logic for login is handled by loginButton click
+    // Login logic is handled by the button clicks
 });
 
 loginButton.addEventListener('click', async () => {
@@ -116,163 +133,91 @@ registerButton.addEventListener('click', async () => {
     }
 });
 
-logoutButton.addEventListener('click', () => {
+navLogoutButton.addEventListener('click', () => {
     token = null;
     currentUsername = null;
     currentUserId = null;
     localStorage.removeItem('blog_token');
     localStorage.removeItem('blog_username');
     localStorage.removeItem('blog_user_id');
-    displayMessage(authMessage, 'Anda telah logout.', 'success');
+    displayMessage(authMessage, 'Anda telah logout.', 'success'); // This message might not be seen if modal is closed immediately
     updateAuthUI();
 });
 
-// --- Postingan ---
+// --- Post Rendering ---
 async function fetchPosts() {
-    postsList.innerHTML = '<p>Memuat postingan...</p>';
+    postsGrid.innerHTML = '<p>Memuat postingan...</p>';
+    heroPostSection.innerHTML = ''; // Clear hero section initially
+    heroPostSection.style.backgroundImage = 'none'; // Remove background image
+
     try {
         const response = await fetch(`${API_URL}/posts`);
         const posts = await response.json();
 
-        postsList.innerHTML = ''; // Clear previous posts
         if (posts.length === 0) {
-            postsList.innerHTML = '<p>Belum ada postingan.</p>';
+            postsGrid.innerHTML = '<p>Belum ada postingan.</p>';
             return;
         }
 
-        posts.forEach(post => {
-            const postCard = document.createElement('div');
-            postCard.className = 'post-card';
-            postCard.innerHTML = `
-                <h3>${post.title}</h3>
-                <p>${post.content}</p>
-                <div class="post-meta">
-                    <span>Oleh: ${post.author_username || 'Anonim'}</span>
-                    <span>${new Date(post.created_at).toLocaleDateString()}</span>
-                    <div class="post-actions">
-                        ${(currentUserId == post.author_id) ? `<button class="edit-btn" data-id="${post.id}">Edit</button>` : ''}
-                        ${(currentUserId == post.author_id) ? `<button class="delete-btn" data-id="${post.id}">Delete</button>` : ''}
+        // Separate the first post for the hero section
+        const heroPost = posts[0];
+        const otherPosts = posts.slice(1);
+
+        // Render Hero Post
+        if (heroPost) {
+            const date = new Date(heroPost.created_at);
+            const formattedDate = `${date.getDate()} ${date.toLocaleString('en-US', { month: 'long' })} ${date.getFullYear()}`;
+            const imageUrl = `https://picsum.photos/seed/${heroPost.id}/1200/450`; // Dynamic image for hero
+
+            heroPostSection.style.backgroundImage = `url('${imageUrl}')`;
+            heroPostSection.innerHTML = `
+                <div class="hero-content">
+                    <div class="hero-tags">
+                        <span class="hero-tag">MUSIC</span>
+                        <span class="hero-tag">FAMOSE</span>
+                    </div>
+                    <div class="hero-date">${formattedDate}</div>
+                    <h2 class="hero-title">${heroPost.title}</h2>
+                    <p class="hero-description">${heroPost.content.substring(0, 200)}...</p>
+                    <div class="hero-meta">
+                        <span><i class="fas fa-comment"></i> 896</span>
+                        <span><i class="fas fa-heart"></i> 5648</span>
                     </div>
                 </div>
             `;
-            postsList.appendChild(postCard);
+        }
+
+        // Render Other Posts in Grid
+        postsGrid.innerHTML = ''; // Clear previous posts
+        otherPosts.forEach(post => {
+            const date = new Date(post.created_at);
+            const formattedDate = `${date.getDate()} ${date.toLocaleString('en-US', { month: 'long' })} ${date.getFullYear()}`;
+            const imageUrl = `https://picsum.photos/seed/${post.id + 100}/400/200`; // Dynamic image for grid cards
+
+            const postCard = document.createElement('div');
+            postCard.className = 'post-card';
+            postCard.innerHTML = `
+                <img src="${imageUrl}" alt="${post.title}" class="post-card-image">
+                <div class="post-card-content">
+                    <div class="post-card-date">${formattedDate}</div>
+                    <h3 class="post-card-title">${post.title}</h3>
+                    <p class="post-card-description">${post.content.substring(0, 100)}...</p>
+                    <div class="post-card-category">
+                        ${post.author_username ? post.author_username.toUpperCase() : 'UNKNOWN'}
+                    </div>
+                </div>
+            `;
+            postsGrid.appendChild(postCard);
         });
 
-        addPostActionListeners();
     } catch (error) {
         console.error('Error fetching posts:', error);
-        postsList.innerHTML = '<p class="message error">Gagal memuat postingan. Pastikan API backend berjalan.</p>';
+        postsGrid.innerHTML = '<p class="message error">Gagal memuat postingan. Pastikan API backend berjalan.</p>';
     }
 }
 
-createPostForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = postTitleInput.value;
-    const content = postContentInput.value;
-
-    if (!token) {
-        displayMessage(createPostMessage, 'Silakan login untuk membuat postingan.', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/posts`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ title, content }),
-        });
-        const data = await response.json();
-
-        if (response.ok) {
-            displayMessage(createPostMessage, data.message, 'success');
-            postTitleInput.value = '';
-            postContentInput.value = '';
-            fetchPosts(); // Refresh posts
-        } else {
-            displayMessage(createPostMessage, data.message || 'Gagal membuat postingan.', 'error');
-        }
-    } catch (error) {
-        console.error('Error creating post:', error);
-        displayMessage(createPostMessage, 'Terjadi kesalahan jaringan.', 'error');
-    }
-});
-
-// --- Edit & Delete Post ---
-async function handleEditPost(postId) {
-    // Untuk demo sederhana, kita akan langsung meminta input baru
-    const newTitle = prompt('Masukkan judul baru:');
-    const newContent = prompt('Masukkan konten baru:');
-
-    if (!newTitle || !newContent) {
-        displayMessage(createPostMessage, 'Judul dan konten tidak boleh kosong.', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/posts/${postId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ title: newTitle, content: newContent }),
-        });
-        const data = await response.json();
-
-        if (response.ok) {
-            displayMessage(createPostMessage, data.message, 'success');
-            fetchPosts(); // Refresh posts
-        } else {
-            displayMessage(createPostMessage, data.message || 'Gagal memperbarui postingan.', 'error');
-        }
-    } catch (error) {
-        console.error('Error updating post:', error);
-        displayMessage(createPostMessage, 'Terjadi kesalahan jaringan.', 'error');
-    }
-}
-
-async function handleDeletePost(postId) {
-    if (!confirm('Apakah Anda yakin ingin menghapus postingan ini?')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/posts/${postId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-        });
-        const data = await response.json();
-
-        if (response.ok) {
-            displayMessage(createPostMessage, data.message, 'success');
-            fetchPosts(); // Refresh posts
-        } else {
-            displayMessage(createPostMessage, data.message || 'Gagal menghapus postingan.', 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting post:', error);
-        displayMessage(createPostMessage, 'Terjadi kesalahan jaringan.', 'error');
-    }
-}
-
-function addPostActionListeners() {
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.removeEventListener('click', (e) => handleEditPost(e.target.dataset.id)); // Hapus listener lama jika ada
-        button.addEventListener('click', (e) => handleEditPost(e.target.dataset.id));
-    });
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.removeEventListener('click', (e) => handleDeletePost(e.target.dataset.id)); // Hapus listener lama jika ada
-        button.addEventListener('click', (e) => handleDeletePost(e.target.dataset.id));
-    });
-}
-
-// Inisialisasi: Panggil fungsi-fungsi saat halaman dimuat
+// Initial load
 document.addEventListener('DOMContentLoaded', () => {
-    updateAuthUI(); // Perbarui UI otentikasi saat halaman dimuat
-    fetchPosts(); // Muat postingan saat halaman dimuat
+    updateAuthUI();
+    fetchPosts();
 });
